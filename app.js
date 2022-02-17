@@ -10,3 +10,15 @@ server.applyMiddleware({ app })
 app.listen({port: 4000}, () => {
     console.log("Listening")
 })
+
+/*
+    Example queries:
+
+    query {
+        generateCode
+    }
+
+    mutation {
+        joinGame(id: 1)
+    }
+*/

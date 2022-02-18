@@ -9,9 +9,9 @@ const typeDefs = gql`
 
     # Mutations
     type Mutation {
-        createGameCode: Int!
+        createGameCode(userId: Int!): Int!
         createUserId: Int!
-        joinGame(id: Int!): Int!
+        joinGame(gameId: Int!, userId: Int!): Int!
         syncPlayerPosition(id: Int!, x: Float!, y: Float!, z: Float!): Int!
     }
 `

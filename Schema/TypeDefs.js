@@ -2,12 +2,18 @@ const { gql } = require('apollo-server-express')
 
 const typeDefs = gql`
 
-    #Queries
+    # Queries
     type Query {
-        generateCode: Int!
+        verifyGameCode(code: Int!): Int!
     }
 
-    #Mutations
+    # Mutations
+    type Mutation {
+        createGameCode(userId: Int!): Int!
+        createUserId: Int!
+        joinGame(gameId: Int!, userId: Int!): Int!
+        syncPlayerPosition(id: Int!, x: Float!, y: Float!, z: Float!): Int!
+    }
 `
 
 module.exports = { typeDefs }

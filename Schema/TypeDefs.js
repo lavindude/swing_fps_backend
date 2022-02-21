@@ -2,7 +2,10 @@ const { gql } = require('apollo-server-express')
 
 const typeDefs = gql`
     type Player {
-        
+        id: Int!
+        positionX: Float!
+        positionY: Float!
+        positionZ: Float!
     }
 
     # Queries

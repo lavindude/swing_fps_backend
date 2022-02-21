@@ -1,33 +1,33 @@
-// const connectedPlayers = {1 : {id: 1, positionX: 0, positionY: 0, positionZ: 0},
-//                           2 : {id: 2, positionX: 0, positionY: 0, positionZ: 0}
-//                          }
-//const lobbies = {"gameCode1" : {numOfPlayers: 4, lobbyPlayers: {"sample": connectedPlayers["sample"]}, 
-//                                                              "sample2": connectedPlayers["sample2"]}}
+const connectedPlayers = {1 : {id: 1, positionX: 0, positionY: 0, positionZ: 0},
+                           2 : {id: 2, positionX: 0, positionY: 0, positionZ: 0}
+                          }
+const lobbies = {1 : {numOfPlayers: 4, lobbyPlayers: [connectedPlayers[1], connectedPlayers[2]]}}
 
 // https://devcenter.heroku.com/articles/deploying-nodejs ==> deployment
 
-const connectedPlayers = {}
-const lobbies = {}
+//const connectedPlayers = {}
+//const lobbies = {}
 
 const resolvers = {
     Query: {
         getLobbyPlayers(parent, args) {
             const lobbyId = args.lobbyId
-            
-            return 1 // we may not need this function
+            return lobbies[lobbyId].lobbyPlayers
         }
     },
     Mutation: {
         createGameCode(parent, args) {
             const userId = args.userId
+            let curUser = {}
+            curUser[userId] = connectedPlayers[userId]
             if (Object.keys(lobbies).length === 0) {
-                lobbies[1] = {numOfPlayers: 4, lobbyPlayers: {userId: connectedPlayers[userId]}}
+                lobbies[1] = {numOfPlayers: 4, lobbyPlayers: curUser}
                 return 1
             }
 
             //else
             let newLobbyId = Object.keys(lobbies).length+1
-            lobbies[newLobbyId] = {numOfPlayers: 4, lobbyPlayers : {userId: connectedPlayers[userId]}}
+            lobbies[newLobbyId] = {numOfPlayers: 4, lobbyPlayers : {userId: curUser}}
             return newLobbyId
         },
         createUserId(parent, args) {

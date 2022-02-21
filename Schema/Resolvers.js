@@ -1,14 +1,19 @@
-const connectedPlayers = {1 : {id: 1, positionX: 0, positionY: 0, positionZ: 0},
-                          2 : {id: 2, positionX: 0, positionY: 0, positionZ: 0}
-                         }
+// const connectedPlayers = {1 : {id: 1, positionX: 0, positionY: 0, positionZ: 0},
+//                           2 : {id: 2, positionX: 0, positionY: 0, positionZ: 0}
+//                          }
 //const lobbies = {"gameCode1" : {numOfPlayers: 4, lobbyPlayers: {"sample": connectedPlayers["sample"]}, 
 //                                                              "sample2": connectedPlayers["sample2"]}}
 
+// https://devcenter.heroku.com/articles/deploying-nodejs ==> deployment
+
+const connectedPlayers = {}
 const lobbies = {}
 
 const resolvers = {
     Query: {
-        verifyGameCode() {
+        getLobbyPlayers(parent, args) {
+            const lobbyId = args.lobbyId
+            
             return 1 // we may not need this function
         }
     },
@@ -21,12 +26,20 @@ const resolvers = {
             }
 
             //else
-            let newLobbyId = Object.keys(lobbies).length + 1
+            let newLobbyId = Object.keys(lobbies).length+1
             lobbies[newLobbyId] = {numOfPlayers: 4, lobbyPlayers : {userId: connectedPlayers[userId]}}
             return newLobbyId
         },
         createUserId(parent, args) {
-            return 2
+            if (Object.keys(connectedPlayers).length === 0) {
+                connectedPlayers[1] = {positionX: 0, positionY: 0, positionZ: 0}
+                return 1
+            }
+
+            //else
+            let newPlayerId = Object.keys(connectedPlayers).length+1
+            connectedPlayers[newPlayerId] = {positionX: 0, positionY: 0, positionZ: 0}
+            return newPlayerId
         },
         joinGame(parent, args) {
             const gameCode = args.gameId
@@ -42,6 +55,16 @@ const resolvers = {
             return 1
         },
         syncPlayerPosition(parents, args) {
+            const playerId = args.id
+            const lobbyId = args.lobbyId
+            const x = args.x
+            const y = args.y
+            const z = args.z
+
+            lobbies[lobbyId].lobbyPlayers[playerId].positionX = x
+            lobbies[lobbyId].lobbyPlayers[playerId].positionY = y
+            lobbies[lobbyId].lobbyPlayers[playerId].positionZ = z
+
             return 1
         }
     }

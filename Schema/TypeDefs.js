@@ -1,10 +1,13 @@
 const { gql } = require('apollo-server-express')
 
 const typeDefs = gql`
+    type Player {
+        
+    }
 
     # Queries
     type Query {
-        verifyGameCode(code: Int!): Int!
+        getLobbyPlayers(lobbyId: Int!): [Player]!
     }
 
     # Mutations
@@ -12,7 +15,7 @@ const typeDefs = gql`
         createGameCode(userId: Int!): Int!
         createUserId: Int!
         joinGame(gameId: Int!, userId: Int!): Int!
-        syncPlayerPosition(id: Int!, x: Float!, y: Float!, z: Float!): Int!
+        syncPlayerPosition(id: Int!, lobbyId: Int!, x: Float!, y: Float!, z: Float!): Int!
     }
 `
 

@@ -1,7 +1,7 @@
-const connectedPlayers = {1 : {id: 1, positionX: 0, positionY: 0, positionZ: 0},
-                           2 : {id: 2, positionX: 0, positionY: 0, positionZ: 0}
-                          }
-const lobbies = {1 : {numOfPlayers: 4, lobbyPlayers: [connectedPlayers[1], connectedPlayers[2]]}}
+const connectedPlayers = [{id: 1, positionX: 0, positionY: 0, positionZ: 0},
+                           {id: 2, positionX: 0, positionY: 0, positionZ: 0}
+                         ]
+const lobbies = {1 : {numOfPlayers: 4, lobbyPlayers: [connectedPlayers[0], connectedPlayers[1]]}}
 
 // https://devcenter.heroku.com/articles/deploying-nodejs ==> deployment
 
@@ -18,27 +18,26 @@ const resolvers = {
     Mutation: {
         createGameCode(parent, args) {
             const userId = args.userId
-            let curUser = {}
-            curUser[userId] = connectedPlayers[userId]
+            const curUser = connectedPlayers[userId-1]
             if (Object.keys(lobbies).length === 0) {
-                lobbies[1] = {numOfPlayers: 4, lobbyPlayers: curUser}
+                lobbies[1] = {numOfPlayers: 4, lobbyPlayers: [curUser]}
                 return 1
             }
 
             //else
             let newLobbyId = Object.keys(lobbies).length+1
-            lobbies[newLobbyId] = {numOfPlayers: 4, lobbyPlayers : {userId: curUser}}
+            lobbies[newLobbyId] = {numOfPlayers: 4, lobbyPlayers: [curUser]}
             return newLobbyId
         },
         createUserId(parent, args) {
-            if (Object.keys(connectedPlayers).length === 0) {
-                connectedPlayers[1] = {positionX: 0, positionY: 0, positionZ: 0}
+            if (connectedPlayers.length === 0) {
+                connectedPlayers[0] = {id: 1, positionX: 0, positionY: 0, positionZ: 0}
                 return 1
             }
 
             //else
-            let newPlayerId = Object.keys(connectedPlayers).length+1
-            connectedPlayers[newPlayerId] = {positionX: 0, positionY: 0, positionZ: 0}
+            const newPlayerId = connectedPlayers.length+1
+            connectedPlayers.push({id: newPlayerId, positionX: 0, positionY: 0, positionZ: 0})
             return newPlayerId
         },
         joinGame(parent, args) {
@@ -50,10 +49,15 @@ const resolvers = {
             }
 
             //else
-            lobbies.gameCode.lobbyPlayers[userId] = connectedPlayers[userId]
-
+            lobbies.gameCode.lobbyPlayers.push(connectedPlayers[userId])
             return 1
         },
+
+        /*
+            Note that the syncPlayerPostition mutation is buggy because the players in 
+            lobbyPlayers may not be in order and it may not be the first 4 connected players
+            in the game server.
+        */
         syncPlayerPosition(parents, args) {
             const playerId = args.id
             const lobbyId = args.lobbyId
@@ -61,9 +65,9 @@ const resolvers = {
             const y = args.y
             const z = args.z
 
-            lobbies[lobbyId].lobbyPlayers[playerId].positionX = x
-            lobbies[lobbyId].lobbyPlayers[playerId].positionY = y
-            lobbies[lobbyId].lobbyPlayers[playerId].positionZ = z
+            lobbies[lobbyId].lobbyPlayers[playerId-1].positionX = x
+            lobbies[lobbyId].lobbyPlayers[playerId-1].positionY = y
+            lobbies[lobbyId].lobbyPlayers[playerId-1].positionZ = z
 
             return 1
         }

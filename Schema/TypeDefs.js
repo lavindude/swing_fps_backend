@@ -8,9 +8,17 @@ const typeDefs = gql`
         positionZ: Float!
     }
 
+    type Lobby {
+        id: Int!
+        numOfPlayers: Int!
+        lobbyPlayers: [Player]!
+    }
+
     # Queries
     type Query {
         getLobbyPlayers(lobbyId: Int!): [Player]!
+        getConnectedPlayers: [Player]!
+        getLobbies: [Lobby]!
     }
 
     # Mutations

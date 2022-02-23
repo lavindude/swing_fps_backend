@@ -1,32 +1,51 @@
-const connectedPlayers = [{id: 1, positionX: 0, positionY: 0, positionZ: 0},
-                           {id: 2, positionX: 0, positionY: 0, positionZ: 0}
-                         ]
-const lobbies = {1 : {numOfPlayers: 4, lobbyPlayers: [connectedPlayers[0], connectedPlayers[1]]}}
+// Sample Data:
+// const connectedPlayers = [{id: 1, positionX: 0, positionY: 0, positionZ: 0},
+//                            {id: 2, positionX: 0, positionY: 0, positionZ: 0}
+//                          ]
+// const lobbies = [{id: 1, numOfPlayers: 4, lobbyPlayers: [connectedPlayers[0], connectedPlayers[1]]}]
 
 // https://devcenter.heroku.com/articles/deploying-nodejs ==> deployment
+// maybe write some automated tests at some point
+// refactor the code to make it more modular, maybe have a logic.js file
+// maybe it's best to store data in a different file
 
-//const connectedPlayers = {}
-//const lobbies = {}
+const connectedPlayers = []
+const lobbies = []
+
+const getIndex = (playerId, lobbyId) => {
+    const curLobbyArray = lobbies[lobbyId-1].lobbyPlayers
+    for (var i=0; i < curLobbyArray.length; i++) {
+        if (curLobbyArray[i].id == playerId) {
+            return i
+        }
+    }
+}
 
 const resolvers = {
     Query: {
         getLobbyPlayers(parent, args) {
             const lobbyId = args.lobbyId
-            return lobbies[lobbyId].lobbyPlayers
+            return lobbies[lobbyId-1].lobbyPlayers
+        },
+        getConnectedPlayers(parent, args) {
+            return connectedPlayers
+        },
+        getLobbies(parent, args) {
+            return lobbies
         }
     },
     Mutation: {
         createGameCode(parent, args) {
             const userId = args.userId
             const curUser = connectedPlayers[userId-1]
-            if (Object.keys(lobbies).length === 0) {
-                lobbies[1] = {numOfPlayers: 4, lobbyPlayers: [curUser]}
+            if (lobbies.length === 0) {
+                lobbies[0] = {id: 1, numOfPlayers: 4, lobbyPlayers: [curUser]}
                 return 1
             }
 
             //else
-            let newLobbyId = Object.keys(lobbies).length+1
-            lobbies[newLobbyId] = {numOfPlayers: 4, lobbyPlayers: [curUser]}
+            const newLobbyId = lobbies.length+1
+            lobbies[newLobbyId-1] = {id: newLobbyId, numOfPlayers: 4, lobbyPlayers: [curUser]}
             return newLobbyId
         },
         createUserId(parent, args) {
@@ -44,20 +63,15 @@ const resolvers = {
             const gameCode = args.gameId
             const userId = args.userId
 
-            if (!Object.keys(lobbies).includes(gameCode)) {
+            const lobbyIdList = lobbies.map(item => item.id)
+            if (!lobbyIdList.includes(gameCode)) {
                 return 0
             }
 
             //else
-            lobbies.gameCode.lobbyPlayers.push(connectedPlayers[userId])
+            lobbies[gameCode-1].lobbyPlayers.push(connectedPlayers[userId-1])
             return 1
         },
-
-        /*
-            Note that the syncPlayerPostition mutation is buggy because the players in 
-            lobbyPlayers may not be in order and it may not be the first 4 connected players
-            in the game server.
-        */
         syncPlayerPosition(parents, args) {
             const playerId = args.id
             const lobbyId = args.lobbyId
@@ -65,9 +79,11 @@ const resolvers = {
             const y = args.y
             const z = args.z
 
-            lobbies[lobbyId].lobbyPlayers[playerId-1].positionX = x
-            lobbies[lobbyId].lobbyPlayers[playerId-1].positionY = y
-            lobbies[lobbyId].lobbyPlayers[playerId-1].positionZ = z
+            const curPlayerLobbyIndex = getIndex(playerId, lobbyId)
+
+            lobbies[lobbyId-1].lobbyPlayers[curPlayerLobbyIndex].positionX = x
+            lobbies[lobbyId-1].lobbyPlayers[curPlayerLobbyIndex].positionY = y
+            lobbies[lobbyId-1].lobbyPlayers[curPlayerLobbyIndex].positionZ = z
 
             return 1
         }

@@ -5,10 +5,11 @@ const { resolvers } = require('./Schema/Resolvers')
 
 const app = express()
 const server = new ApolloServer({ typeDefs, resolvers })
+const port = process.env.PORT || 4000
 
 server.applyMiddleware({ app })
-app.listen({port: 4000}, () => {
-    console.log("Listening")
+app.listen({port: port}, () => {
+    console.log("Listening on port " + port)
 })
 
 /*

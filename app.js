@@ -4,7 +4,7 @@ const { typeDefs } = require('./Schema/TypeDefs')
 const { resolvers } = require('./Schema/Resolvers')
 
 const app = express()
-const server = new ApolloServer({ typeDefs, resolvers, playground: true })
+const server = new ApolloServer({ typeDefs, resolvers, playground: true, introspection: true })
 const port = process.env.PORT || 4000
 
 server.applyMiddleware({ app })

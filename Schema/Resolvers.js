@@ -4,7 +4,6 @@
 //                          ]
 // const lobbies = [{id: 1, numOfPlayers: 4, lobbyPlayers: [connectedPlayers[0], connectedPlayers[1]]}]
 
-// https://devcenter.heroku.com/articles/deploying-nodejs ==> deployment
 // maybe write some automated tests at some point
 // refactor the code to make it more modular, maybe have a logic.js file
 // maybe it's best to store data in a different file
